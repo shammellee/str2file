@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use v5.10;
+use subs qw(isFile isDir createFiles createDirs);
+
+use constant DIR_MASK => 0755;
+
+main(@ARGV);
+
+sub main
+{
+	my @files = split /\s+/,shift or exit;
+	my $first = shift @files;
+
+	if(isFile $first)
+	{
+		createFiles @files;
+	}elsif(isDir $first)
+	{
+		createDirs @files;
+	}else
+	{
+		unshift @files,$first;
+		createFiles @files;
+	}
+}
+
+sub isFile
+{
+	return (shift =~ /^f\:$/i) || 0;
+}
+
+sub isDir
+{
+	return (shift =~ /^d\:$/i) || 0;
+}
+
+sub createFiles
+{
+	unless(@_)
+	{
+		say "Expected file list";
+		exit 1;
+	}
+
+	foreach(@_)
+	{
+		if(!-e)
+		{
+			open FH,'>',$_;
+			close FH;
+		}
+	}
+}
+
+sub createDirs
+{
+	unless(@_)
+	{
+		say "Expected directory list";
+		exit 1;
+	}
+
+	foreach(@_)
+	{
+		if(!-e)
+		{
+			mkdir $_,DIR_MASK;
+		}
+	}
+}
